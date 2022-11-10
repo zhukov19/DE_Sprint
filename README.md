@@ -6,4 +6,5 @@ Author: Zhukov Alexey <jukov_aleksey@mail.ru>
 Date:   Thu Nov 10 18:37:52 2022 +0300
 
     Education
-
+https://github.com/kkolyagin/course_data_engineer
+...
