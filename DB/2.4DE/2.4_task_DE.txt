@@ -1,0 +1,115 @@
+-- Table: emp.employees
+
+-- DROP TABLE IF EXISTS emp.employees;
+
+CREATE TABLE IF NOT EXISTS emp.employees
+(
+    name text COLLATE pg_catalog."default",
+    id integer,
+    dob date,
+    start_date_work date,
+    "position" text COLLATE pg_catalog."default",
+    skill_level text COLLATE pg_catalog."default",
+    salary integer,
+    safety text COLLATE pg_catalog."default",
+    id_dep numeric
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS emp.employees
+    OWNER to postgres;
+
+COMMENT ON COLUMN emp.employees.skill_level
+    IS 'уровень мастерства';
+
+COMMENT ON COLUMN emp.employees.safety
+    IS '(True/False)';
+
+-- Table: emp.info_depart
+
+-- DROP TABLE IF EXISTS emp.info_depart;
+
+CREATE TABLE IF NOT EXISTS emp.info_depart
+(
+    id_dep numeric,
+    name_dep text COLLATE pg_catalog."default",
+    supervisor text COLLATE pg_catalog."default",
+    number_emp numeric,
+    id integer
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS emp.info_depart
+    OWNER to postgres;
+
+-- Table: emp.emp_evaluation
+
+-- DROP TABLE IF EXISTS emp.emp_evaluation;
+
+CREATE TABLE IF NOT EXISTS emp.emp_evaluation
+(
+    id numeric,
+    name "char",
+    evaluation "char"
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS emp.emp_evaluation
+    OWNER to postgres;
+
+--Заполняем данными первую таблицу.
+INSERT INTO emp.employees (id, name, dob, start_date_work, position, skill_level, salary, safety, id_dep)
+values ('1', 'Иванов Иван Иванович', '1985-06-19', '2005-08-12', 'Инженер-программист', 'middle', '150000', 'True', '3'),
+values ('2', 'Петров Андрей Николаевич', '1989-07-21', '2007-09-15', 'Системный администратор', 'middle', '120000', 'True', '1'),
+values ('3', 'Володин Виталий Евгеньевич', '1993-12-07', '2020-06-15', 'Системный аналитик', 'junior', '70000', 'False', '2'),
+values ('4', 'Аксенов Анатолий Михайлович', '1981-11-05', '2015-03-23', 'Инженер-программист', 'senior', '200000', 'True', '2'),
+values ('5', 'Аксенов Анатолий Михайлович', '1993-02-17', '2022-06-15', 'Инженер-программист', 'junior', '50000', 'False', '1');
+
+--Заполняем данными вторую таблицу.
+INSERT INTO emp.info_depart (id, id_dep, name_dep, supervisor, number_emp)
+values ('6', '1', 'Информационных технологий', 'Трофимов Сергей Иванович', '30'),
+values ('7', '2', 'Информационной безопасности', 'Корнетов Никита Олегович', '50'),
+values ('8', '3', 'Аналитический', 'Сагдеев Ришат Анварович', '40');
+
+--Заполняем данными третью таблицу.
+INSERT INTO emp.emp_evaluation (id, name, evaluation)
+values ('6', 'Трофимов Сергей Иванович', 'A'),
+values ('7', 'Корнетов Никита Олегович', 'B'),
+values ('8', 'Сагдеев Ришат Анварович', 'C');
+
+--Добавляем данные после открытия нового отдела.
+INSERT INTO emp.info_depart (id, id_dep, name_dep, supervisor, number_emp)
+values ('9', '4', 'Интеллектуального анализа данных', 'Сергеев Виктор Денисович', '3');
+
+INSERT INTO emp.employees (id, name, dob, start_date_work, position, skill_level, salary, safety, id_dep)
+values ('10', 'Никитин Георгий Александрович', '1988-04-09', '2022-12-01', 'Инженер данных', 'senior', '250000', 'True', '4'),
+values ('11', 'Яушев Антон Владимирович', '1978-06-27', '2022-12-01', 'Аналитик данных', 'middle', '150000', 'False', '4');
+
+--Анализ данных:
+--2.a Попробуйте вывести не просто самую высокую зарплату во всей команде, а вывести именно фамилию сотрудника с самой высокой зарплатой.
+SELECT name FROM emp.employees WHERE salary = (SELECT max(salary) FROM emp.employees);
+--b.Попробуйте вывести фамилии сотрудников в алфавитном порядке
+SELECT name FROM emp.employees ORDER BY name;
+--c.Рассчитайте средний стаж для каждого уровня сотрудников.
+SELECT avg(day), skill_level
+from (select (current_date - employees.start_date_work)/365 as day, skill_level
+      from emp.employees) as temp
+group by skill_level;
+--d.Выведите фамилию сотрудника и название отдела, в котором он работает
+select name, name_dep
+from emp.employees
+         left join emp.info_depart on employees.id_dep = info_depart.id_dep;
+--e.Выведите название отдела и фамилию сотрудника с самой высокой зарплатой в данном отделе и саму зарплату также.
+with dep_max_sal as (
+    select id_dep, max(salary) as max_salary
+    from emp.employees
+    group by id_dep)
+select name, name_dep, max_salary
+from dep_max_sal dms
+left join emp.employees emp on dms.id_dep = emp.id_dep and dms.max_salary = emp.salary
+left join emp.info_depart dp on dms.id_dep = dp.id_dep;
+
+

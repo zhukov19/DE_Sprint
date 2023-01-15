@@ -1,0 +1,30 @@
+Переносим папку с файлами в HDFS
+hdfs dfs -copyFromLocal /home/cloudera/Desktop/vim /user/cloudera
+ 
+Выведем на экран содержимое папки /user/cloudera/book
+hdfs dfs -ls /user/cloudera/book
+
+Cожмите все 4 тома в 1 файл.
+hdfs dfs -getmerge -nl /user/cloudera/book/tom1.txt /user/cloudera/book/tom2.txt /user/cloudera/book/tom3.txt /user/cloudera/book/tom4.txt /home/cloudera/Desktop/book/warandworld.txt
+
+Теперь давайте изменим права доступа к нашему файлу. Чтобы с нашим файлом могли взаимодействовать коллеги, 
+установите режим доступа, который дает полный доступ для владельца файла, а для сторонних 
+пользователей возможность читать и выполнять.
+hdfs dfs -chmod 775 /user/cloudera/book/warandworld.txt
+
+Посмотреть права для файлов.
+hdfs dfs -ls /user/cloudera/book
+
+Выведем на экран информацию о размере полученного файла
+hdfs dfs -du -h /user/cloudera/book/warandworld.txt
+
+Изменим фактор репликации для папки /user/cloudera/book на 2
+
+hdfs dfs -setrep -w 2 /user/cloudera/book
+
+Выведем на экран информацию о размере полученных файлов
+hdfs dfs -du -h /user/cloudera/book/
+
+Выведем количество строк в вашем файле
+ 
+hdfs dfs -cat /user/cloudera/book/warandworld.txt | wc -l
