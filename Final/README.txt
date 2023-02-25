@@ -19,5 +19,5 @@ java: 1.8.0_352 (Private Build)
 ├── data_parquets              # Витрины данных (parquet)
 ├── screen                     # Скриншоты
 ├── Task4Bank.ipynb            # Исходный код программы (Jupyter notebook)
-└── README.md
+└── README.txt
 
